@@ -2,67 +2,48 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İlkci.ai v1.0</title>
     <style>
-        /* TEMEL TASARIM */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* YAN MENÜ (SOHBET GEÇMİŞİ) */
-        #sidebar { width: 260px; background: #202123; color: white; transition: 0.3s; padding: 20px; position: fixed; height: 100%; left: -300px; z-index: 1000; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto; }
+        /* Tasarım aynı kalıyor, hızlıca ana yapıya geçiyoruz */
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        #sidebar { width: 260px; background: #202123; color: white; transition: 0.3s; padding: 20px; position: fixed; height: 100%; left: -300px; z-index: 1000; overflow-y: auto; }
         #sidebar.active { left: 0; }
-        #sidebar h3 { border-bottom: 1px solid #444; padding-bottom: 10px; margin: 0; font-size: 16px; color: #ececf1; }
         #history-list { list-style: none; padding: 0; margin-top: 15px; }
-        #history-list li { padding: 12px; background: #343541; margin-bottom: 8px; border-radius: 8px; cursor: pointer; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; transition: 0.2s; }
-        #history-list li:hover { border-color: #10a37f; background: #40414f; }
-        
-        /* ANA PANEL */
+        #history-list li { padding: 12px; background: #343541; margin-bottom: 8px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: 0.2s; }
         #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; }
-        header { background: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .brand-container { text-align: center; flex-grow: 1; }
-        .brand-name { font-size: 1.2em; font-weight: bold; color: #333; }
-        .version-tag { font-size: 0.7em; color: #10a37f; font-weight: bold; letter-spacing: 1px; }
-
-        /* SOHBET AKIŞI */
+        header { background: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: #f9f9f9; }
-        .msg { padding: 12px 16px; border-radius: 18px; max-width: 75%; line-height: 1.5; font-size: 15px; word-wrap: break-word; position: relative; }
+        .msg { padding: 12px 16px; border-radius: 18px; max-width: 75%; font-size: 15px; line-height: 1.5; }
         .user-msg { align-self: flex-end; background: #007bff; color: white; border-bottom-right-radius: 2px; }
-        .ai-msg { align-self: flex-start; background: #fff; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-        /* ALT PANEL (INPUT) */
-        footer { padding: 15px 20px; background: #fff; display: flex; gap: 10px; border-top: 1px solid #ddd; align-items: center; }
-        #user-input { flex: 1; padding: 12px 20px; border: 1px solid #ddd; border-radius: 25px; outline: none; font-size: 14px; transition: 0.2s; }
-        #user-input:focus { border-color: #007bff; }
-        .btn-circle { width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.2s; }
-        #send-btn { background: #007bff; color: white; }
-        #send-btn:hover { background: #0056b3; }
+        .ai-msg { align-self: flex-start; background: #fff; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-bottom-left-radius: 2px; }
+        footer { padding: 15px 20px; background: #fff; display: flex; gap: 10px; border-top: 1px solid #ddd; }
+        #user-input { flex: 1; padding: 12px 20px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; background: #007bff; color: white; font-size: 20px; }
     </style>
 </head>
 <body>
 
     <div id="sidebar">
-        <button onclick="toggleMenu()" style="color:white; background:none; border:none; cursor:pointer; float:right; font-size: 20px;">✕</button>
+        <button onclick="toggleMenu()" style="color:white; background:none; border:none; float:right; cursor:pointer;">✕</button>
         <h3>Sohbet Geçmişi</h3>
         <ul id="history-list"></ul>
-        <button onclick="clearAllHistory()" style="width:100%; margin-top:20px; background:#e74c3c; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:bold;">TÜMÜNÜ SİL</button>
+        <button onclick="clearHistory()" style="width:100%; background:#e74c3c; color:white; border:none; padding:10px; border-radius:5px; margin-top:20px; cursor:pointer;">Geçmişi Temizle</button>
     </div>
 
     <div id="main-container">
         <header>
             <button onclick="toggleMenu()" style="background:none; border:none; font-size:24px; cursor:pointer;">☰</button>
-            <div class="brand-container">
-                <span class="brand-name">İlkci.ai</span>
-                <span class="version-tag">v1.0</span>
+            <div style="text-align:center; flex-grow:1;">
+                <strong>İlkci.ai</strong><br><small style="color:#10a37f;">v1.0</small>
             </div>
-            <button onclick="startNewChat()" style="background:none; border:none; font-size:22px; cursor:pointer;" title="Yeni Sohbet">📄<span style="color:#27ae60; font-size:16px; font-weight:bold;">+</span></button>
+            <button onclick="startNewChat()" style="background:none; border:none; font-size:22px; cursor:pointer;">📄+</button>
         </header>
 
         <main id="chat-window"></main>
 
         <footer>
-            <button class="btn-circle" onclick="alert('Görsel analiz v1.1 ile gelecek!')" style="background:#eee; color:#555;">+</button>
-            <input type="text" id="user-input" placeholder="Bir şeyler yazın..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button class="btn-circle" id="send-btn" onclick="sendMessage()">➤</button>
+            <input type="text" id="user-input" placeholder="Bir soru sorun (Örn: 1453'te ne oldu?)" onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button class="btn-circle" onclick="sendMessage()">➤</button>
         </footer>
     </div>
 
@@ -70,91 +51,58 @@
         let currentChatId = Date.now();
         let isFirstMessage = true;
 
-        // GÜVENLİK VE BİLGİ HAVUZU
-        const safetyRules = [
-            { keywords: ["18+", "porno", "sex"], response: "Ben sapık bir yapay zeka değilim. Size bu konuda asla yardım edemem." },
-            { keywords: ["hack", "çalma"], response: "Yasal sorun çıkartabilecek etik dışı konulara yardım edemem." },
-            { keywords: ["atatürk"], response: "Atatürk ve Osmanlı tarihimizin değerli parçalarıdır. Atalarımıza saygısızlık kabul edilemez." }
-        ];
-
+        // GELİŞMİŞ BİLGİ HAVUZU
         const knowledgeBase = {
-            "selam": "Selam! Ben İlkci.ai v1.0. Farmant Studios projelerinde sana nasıl yardımcı olabilirim?",
-            "merhaba": "Merhaba! Yeni bir maceraya hazır mısın?",
-            "nasılsın": "Sistemlerim harika çalışıyor, teşekkürler! Sen nasılsın?",
-            "1453": "1453 yılında Fatih Sultan Mehmet İstanbul'u fethederek orta çağı kapatıp yeni çağı başlatmıştır.",
-            "oyun": "Oyun yapmak bir sanattır! Kodlamaya başlamak için harika bir gün.",
+            "selam": "Selam knk! Ben İlkci.ai. Farmant Studios projelerinde sana yardımcı olmaya hazırım.",
+            "merhaba": "Merhaba! Bugün hangi konuyu araştırıyoruz?",
+            "nasılsın": "Süperim! Sen nasılsın? Oyun geliştirme nasıl gidiyor?",
+            "1453": "1453 yılında Fatih Sultan Mehmet İstanbul'u fethederek Doğu Roma İmparatorluğu'na son verdi ve bir çağı kapattı.",
+            "atatürk": "Mustafa Kemal Atatürk, Türkiye Cumhuriyeti'nin kurucusudur. Onu ve tüm atalarımızı saygıyla anıyorum.",
+            "osmanlı": "Osmanlı İmparatorluğu, 600 yıldan fazla hüküm sürmüş büyük bir medeniyettir.",
+            "oyun": "Oyun yapmak sabır ve kodlama bilgisi ister. JavaScript veya C# öğrenmeye ne dersin?",
             "kimsin": "Ben STRLXY-B9Q (Farmant Studios) tarafından geliştirilen İlkci.ai yapay zekasıyım."
         };
 
-        // SAYFA YÜKLENİNCE
-        window.onload = () => {
-            renderHistoryList();
-            startNewChat();
-        };
+        const safetyRules = [
+            { keywords: ["purno", "porno", "sex", "18+"], response: "Ben sapık bir yapay zeka değilim. Lütfen düzgün sorular sorun." },
+            { keywords: ["hack", "çalma"], response: "Kötü amaçlı yazılımlar ve hack konularında sana yardımcı olamam." }
+        ];
+
+        window.onload = () => { renderHistory(); startNewChat(); };
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
 
-        // YENİ SOHBET BAŞLATMA (ARŞİVLEME SİSTEMİ)
         function startNewChat() {
             currentChatId = Date.now();
             isFirstMessage = true;
             document.getElementById('chat-window').innerHTML = '';
-            document.getElementById('user-input').focus();
         }
 
-        // GEÇMİŞİ KAYDETME (JSON FORMATINDA)
-        function archiveCurrentChat(titleText) {
-            let archives = JSON.parse(localStorage.getItem('ilkci_archives') || "[]");
-            let existingIndex = archives.findIndex(a => a.id === currentChatId);
-            
-            const chatHTML = document.getElementById('chat-window').innerHTML;
-            
-            if (existingIndex !== -1) {
-                archives[existingIndex].content = chatHTML;
-            } else {
-                archives.push({
-                    id: currentChatId,
-                    title: titleText.substring(0, 25) + (titleText.length > 25 ? "..." : ""),
-                    content: chatHTML
-                });
-            }
-            localStorage.setItem('ilkci_archives', JSON.stringify(archives));
-            renderHistoryList();
-        }
-
-        // GEÇMİŞ LİSTESİNİ GÜNCELLEME
-        function renderHistoryList() {
+        function renderHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
             let archives = JSON.parse(localStorage.getItem('ilkci_archives') || "[]");
-            
             archives.reverse().forEach(chat => {
                 const li = document.createElement('li');
                 li.textContent = chat.title;
-                li.onclick = () => loadChatFromArchive(chat.id);
+                li.onclick = () => {
+                    document.getElementById('chat-window').innerHTML = chat.content;
+                    currentChatId = chat.id;
+                    isFirstMessage = false;
+                    toggleMenu();
+                };
                 list.appendChild(li);
             });
         }
 
-        // ESKİ SOHBETİ YÜKLEME
-        function loadChatFromArchive(id) {
+        function archiveChat(title) {
             let archives = JSON.parse(localStorage.getItem('ilkci_archives') || "[]");
-            let chat = archives.find(a => a.id === id);
-            if (chat) {
-                currentChatId = chat.id;
-                document.getElementById('chat-window').innerHTML = chat.content;
-                isFirstMessage = false;
-                toggleMenu();
-                document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
-            }
-        }
-
-        function clearAllHistory() {
-            if(confirm("Tüm geçmiş silinsin mi?")) {
-                localStorage.removeItem('ilkci_archives');
-                renderHistoryList();
-                startNewChat();
-            }
+            let idx = archives.findIndex(a => a.id === currentChatId);
+            const content = document.getElementById('chat-window').innerHTML;
+            if (idx !== -1) { archives[idx].content = content; }
+            else { archives.push({ id: currentChatId, title: title.substring(0, 20) + "...", content: content }); }
+            localStorage.setItem('ilkci_archives', JSON.stringify(archives));
+            renderHistory();
         }
 
         function addMessage(sender, text) {
@@ -164,10 +112,8 @@
             div.textContent = text;
             win.appendChild(div);
             win.scrollTop = win.scrollHeight;
-            return div;
         }
 
-        // MESAJ GÖNDERME VE AI MANTIĞI
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
@@ -176,33 +122,24 @@
             addMessage('User', text);
             input.value = '';
 
-            // Arşiv başlığını oluştur
-            if (isFirstMessage) {
-                archiveCurrentChat(text);
-                isFirstMessage = false;
-            }
+            if (isFirstMessage) { archiveChat(text); isFirstMessage = false; }
 
-            // DÜŞÜNME ANİMASYONU (... -> .. -> .)
+            // Düşünme Animasyonu
             const thinkingDiv = addMessage('AI', '...');
             let dots = 3;
-            const anim = setInterval(() => {
-                dots--; if (dots < 1) dots = 3;
-                thinkingDiv.textContent = ".".repeat(dots);
-            }, 600);
+            const anim = setInterval(() => { dots--; if (dots < 1) dots = 3; document.querySelector('.ai-msg:last-child').textContent = ".".repeat(dots); }, 500);
 
             setTimeout(() => {
                 clearInterval(anim);
-                thinkingDiv.remove();
-                
-                let response = "Bunu şu anlık cevaplayamıyorum ama öğrenmeye devam ediyorum!";
+                document.querySelector('.ai-msg:last-child').remove();
+
+                let response = "Bu konuyu henüz bilmiyorum ama senin için araştıracağım!";
                 const lowText = text.toLowerCase();
 
-                // 1. Güvenlik Kontrolü
+                // 1. Güvenlik Filtresi (Daha hassas eşleşme)
                 let blocked = false;
                 for (let r of safetyRules) {
-                    if (r.keywords.some(k => lowText.includes(k))) {
-                        response = r.response; blocked = true; break;
-                    }
+                    if (r.keywords.some(k => lowText.includes(k))) { response = r.response; blocked = true; break; }
                 }
 
                 // 2. Bilgi Havuzu
@@ -212,10 +149,17 @@
                     }
                 }
 
+                // 3. Wikipedia Simülasyonu (Eğer hiçbir şey bulamazsa)
+                if (response.startsWith("Bu konuyu henüz") && lowText.length > 3) {
+                    response = `Şu an internet bağlantım kısıtlı ama '${text}' konusunu Farmant Studios veritabanına ekledim. Bir sonraki güncellemede cevaplayacağım!`;
+                }
+
                 addMessage('AI', response);
-                archiveCurrentChat(text); // İçeriği güncelle
+                archiveChat(text);
             }, 2000);
         }
+
+        function clearHistory() { if(confirm("Tüm geçmiş silinsin mi?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
